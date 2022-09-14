@@ -15,11 +15,11 @@
         <form method="POST" action="">
             <label>
                 <input placeholder="Greutatea în kg" type="number" id="greutate" name="greutate" required>
-                <span class="span-kg" id="greutateSpan">kg</span>
+                <span class="span-off" id="greutateSpan">kg</span>
             </label>
             <label>
-                <input placeholder="Înălțimea în cm" type="number" id="inaltime" name="inaltime" value_max="2.7" required>
-                <span class="span-cm" id="inaltimeSpan">cm</span>
+                <input placeholder="Înălțimea în cm" type="number" id="inaltime" name="inaltime" required>
+                <span class="span-off" id="inaltimeSpan">cm</span>
             </label>
             <button type="submit">Calculează</button>
         </form>
@@ -28,14 +28,24 @@
                 session_start();
                 $_SESSION['inregistrare'] = $_POST;
 
-                foreach($_SESSION as $inregistrare) {
-                    $greutate = 87;
-                    $inaltime = 178;
-                    $formInaltime = pow($inaltime, 2);
-                    $BMI = $greutate / $formInaltime * 10000;
-                    $formBMI = number_format($BMI, 2);
-                    echo "<p>$formBMI</p>";
+                foreach($_SESSION as $inregistrare => $valoare) { 
+                    foreach($valoare as $atribut => $val) {
+                        if ($atribut === 'greutate' ) $greutate = $val;
+                        if ($atribut === 'inaltime' ) $inaltime = $val;
+                    }
+                    if (isset($inaltime, $greutate)) {
+                        $formInaltime = pow($inaltime, 2);
+                        $BMI = $greutate / $formInaltime * 10000;
+                        $formBMI = number_format($BMI, 2);
+                        echo "<p>Greutate: <strong>$greutate</strong> kg</p>";
+                        echo "<p style='margin-bottom: 1em'>Înălțime: <strong>$inaltime</strong> cm</p>";
+                        if ($formBMI < 18.5) echo "<p>Indicele BMI este: <strong>$formBMI</strong> și se încadrează în categoria <span style='color:#FDD037'>SUBPONDERAL</span>.";
+                        if ($formBMI >= 18.5 && $formBMI < 25) echo "<p>Indicele BMI este: <strong>$formBMI</strong> și se încadrează în categoria <span style='color:#6BBD99'>NORMOPONDERAL</span>.";
+                        if ($formBMI >= 25  && $formBMI < 30) echo "<p>Indicele BMI este: <strong>$formBMI</strong> și se încadrează în categoria <span style='color:#E65C4F'>SUPRAPONDERAL</span>.";
+                        if ($formBMI >= 30) echo "<p>Indicele BMI este: <strong>$formBMI</strong> și se încadrează în categoria <span style='color:#861F1F'>OBEZITATE</span>.";
+                    }
                 }
+                session_destroy();
             ?>
         </div>
     </main>
